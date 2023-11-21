@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 var jwt = require("jsonwebtoken");
 const { ResponseTemplate } = require("../helper/template_helper");
 const { token } = require("morgan");
+const Sentry = require("@sentry/node");
 
 async function register(req, res, next) {
   try {
@@ -58,7 +59,9 @@ async function authUser(req, res) {
       return;
     }
   } catch (error) {
+    let resp = ResponseTemplate(false, "Internal Server Error", false, 500);
     Sentry.captureException(error);
+    res.json(resp);
     return;
   }
 }
